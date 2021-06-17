@@ -1,6 +1,7 @@
 package com.college.data.takes;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,10 +17,10 @@ public class Takes {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.EAGER)
     private Student student;
     
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.EAGER)
     private Course course;
 
     public Takes () {}

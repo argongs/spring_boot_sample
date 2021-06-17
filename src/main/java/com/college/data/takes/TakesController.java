@@ -44,9 +44,7 @@ public class TakesController {
 
     @RequestMapping ("/data/takes/{takes_info}")
     public List<Takes> showTakes (
-        @PathVariable ("takes_info") 
-        @NotBlank 
-        @NotNull 
+        @PathVariable ("takes_info")
         String takesInfo
     ) {
         

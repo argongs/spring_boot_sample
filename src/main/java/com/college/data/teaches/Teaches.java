@@ -3,6 +3,7 @@ package com.college.data.teaches;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -14,13 +15,13 @@ import com.college.data.professor.Professor;
 public class Teaches {  
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private int id;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.EAGER)
     private Professor professor;
     
-    @OneToOne
+    @OneToOne (fetch = FetchType.EAGER)
     private Course course;
 
     public Teaches () {}
