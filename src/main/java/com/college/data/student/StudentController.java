@@ -3,6 +3,7 @@ package com.college.data.student;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -11,9 +12,11 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,23 +43,21 @@ public class StudentController {
         return studentService.showStudents();
     }
 
-    @RequestMapping ("/data/students/{student_info}")
+    @RequestMapping ("/data/students/{student_name_or_id}")
     public Student showStudent (
-        @PathVariable ("student_info") 
-        @NotBlank 
-        @NotNull 
-        String studentInfo
+        @PathVariable ("student_name_or_id")  
+        String studentNameOrId
     ) {
         
         Student student;
         
         try {
-            // Assume 'studentInfo' to represent student id, intially
-            student = studentService.showStudentById (studentInfo);    
+            // Assume 'studentNameOrId' to represent student id, intially
+            student = studentService.showStudentById (studentNameOrId);    
         } catch (NoSuchElementException e1) {
             try {
-                // Once student id assumption fails, then assume 'studentInfo' to be student name
-                student = studentService.showStudentByName (studentInfo);
+                // Once student id assumption fails, then assume 'studentNameOrId' to be student name
+                student = studentService.showStudentByName (studentNameOrId);
             } catch (NoSuchElementException e2) {
                 // Once both the assumptions fail, then return null
                 student = null;
@@ -70,88 +71,59 @@ public class StudentController {
     // Mappings for POST calls to student service
     
     @RequestMapping (method = RequestMethod.POST, value = "/data/student")
-    public ResponseEntity<String> addStudent (@RequestBody Student student) {
-        
-        if (student.isInvalid ())
-            return new ResponseEntity<String> (
-                "Invalid input", 
-                HttpStatus.BAD_REQUEST
-            );
-        else {
-            studentService.addStudent (student);            
-            return ResponseEntity.ok ("Valid input");
-        }
+    public ResponseEntity<String> addStudent (@Valid @RequestBody Student student) {
 
+        studentService.addStudent (student);            
+        return ResponseEntity.ok (student.toString ());
+    
     }
 
     @RequestMapping (method = RequestMethod.POST, value = "/data/students")
-    public ResponseEntity<String> addStudents (@RequestBody List<Student> students) {
+    public ResponseEntity<String> addStudents (@RequestBody List<@Valid Student> students) {
         
         for (Student student : students) {
-            if (student.isInvalid ())
-                return new ResponseEntity<String> (
-                    "Invalid input", 
-                    HttpStatus.BAD_REQUEST
-                );
-            else {
                 studentService.addStudent (student);            
-            }
         }    
 
-        return ResponseEntity.ok ("Valid input");
+        return ResponseEntity.ok (students.toString ());
+    
     }
 
     // Mappings for PUT calls to student service
     
     @RequestMapping (method = RequestMethod.PUT, value = "/data/student")
-    public ResponseEntity<String> updateStudent (@RequestBody Student student) {
+    public ResponseEntity<String> updateStudent (@Valid @RequestBody Student student) {
         
-        if (student.isInvalid ())
-            return new ResponseEntity<String> (
-                "Invalid input", 
-                HttpStatus.BAD_REQUEST
-            );
-        else {
-            studentService.updateStudent (student);            
-            return ResponseEntity.ok ("Valid input");
-        }
+        studentService.updateStudent (student);            
+        return ResponseEntity.ok (student.toString ());
 
     }
 
     @RequestMapping (method = RequestMethod.PUT, value = "/data/students")
-    public ResponseEntity<String> updateStudents (@RequestBody List<Student> students) {
+    public ResponseEntity<String> updateStudents (@RequestBody List<@Valid Student> students) {
 
         for (Student student : students) {
-            if (student.isInvalid ())
-                return new ResponseEntity<String> (
-                    "Invalid input", 
-                    HttpStatus.BAD_REQUEST
-                );
-            else {
-                studentService.updateStudent (student);
-            }
+            studentService.updateStudent (student);
         }    
                
-        return ResponseEntity.ok ("Valid input");
+        return ResponseEntity.ok (students.toString ());
     }
 
     // Mappings for DELETE calls to student service
 
-    @RequestMapping (method = RequestMethod.DELETE, value = "/data/students/{student_info}")
+    @RequestMapping (method = RequestMethod.DELETE, value = "/data/students/{student_name_or_id}")
     public void deleteStudent (
-        @PathVariable ("student_info") 
-        @NotBlank 
-        @NotNull 
-        String studentInfo 
+        @PathVariable ("student_name_or_id")
+        String studentNameOrId 
     ) {
         
         try {
-            // Assume 'studentInfo' to represent student id, intially
-            studentService.deleteStudentById (studentInfo);    
+            // Assume 'studentNameOrId' to represent student id, intially
+            studentService.deleteStudentById (studentNameOrId);    
         } catch (EmptyResultDataAccessException e1) {
             try {
-                // Once student id assumption fails, then assume 'studentInfo' to be student name
-                studentService.deleteStudentByName (studentInfo);
+                // Once student id assumption fails, then assume 'studentNameOrId' to be student name
+                studentService.deleteStudentByName (studentNameOrId);
             } catch (EmptyResultDataAccessException e2) {
                 // Once both the assumptions fail, then simply return
                 System.out.println ("Failed to delete!");
@@ -162,10 +134,13 @@ public class StudentController {
     }
 
     @RequestMapping (method = RequestMethod.DELETE, value = "/data/students")
-    public void deleteStudents (@RequestBody List<String> studentInfos) {
+    public void deleteStudents (
+        @RequestBody 
+        List<@NotBlank @NotNull String> studentNameOrIds
+    ) {
 
-        for (String studentInfo : studentInfos)
-            deleteStudent (studentInfo);
+        for (String studentNameOrId : studentNameOrIds)
+            deleteStudent (studentNameOrId);
 
     }
 
@@ -173,10 +148,35 @@ public class StudentController {
 
     @ExceptionHandler(MismatchedInputException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleMismatchedInputException(
+    public ResponseEntity<String> handleMismatchedInputException (
         MismatchedInputException exception
     ) {
-        logger.info("Recieved data with incorrect syntax");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());  
+        logger.info ("Recieved data with incorrect syntax");
+        return ResponseEntity
+            .status (HttpStatus.BAD_REQUEST)
+            .body (exception.getMessage());   
     }
+
+    @ExceptionHandler (DataIntegrityViolationException.class)
+    @ResponseStatus (HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleDataIntegrityViolationException (
+        DataIntegrityViolationException exception
+    ) {
+        logger.info ("Recieved data in clear violation with data integrity");
+        return ResponseEntity
+            .status (HttpStatus.BAD_REQUEST)
+            .body (exception.getMessage());
+    }
+
+    @ExceptionHandler (HttpMessageNotReadableException.class)
+    @ResponseStatus (HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleHttpMessageNotReadableException(
+        HttpMessageNotReadableException exception
+    ) {
+        logger.info ("Failed to read the contents of the request");
+        return ResponseEntity
+            .status (HttpStatus.BAD_REQUEST)
+            .body (exception.getMessage());
+    }
+
 }

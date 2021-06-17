@@ -2,22 +2,24 @@ package com.college.data.course;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class Course {
     
     @Id
-    private String id;
-    @Column(nullable = false)
+    @GeneratedValue (strategy = GenerationType.AUTO)
+    private int id;
+    @Column (nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column (nullable = false)
     private int credits;
 
     public Course () {}
 
-    public Course (String id, String name, int credits) {
-        this.id = id;
+    public Course (String name, int credits) {
         this.name = name;
         this.credits = credits;
     }
@@ -31,11 +33,10 @@ public class Course {
     public boolean isInvalid () {
         
         try {
-            boolean idIsAbsent = id.isEmpty () || id.isBlank ();
             boolean nameIsAbsent = name.isEmpty () || name.isBlank ();
             boolean creditIsInvalid = credits <= 0;
             
-            if (idIsAbsent || nameIsAbsent || creditIsInvalid)
+            if (nameIsAbsent || creditIsInvalid)
                 return true;
             else
                 return false;
@@ -47,7 +48,7 @@ public class Course {
     }
 
     // Getters
-    public String getId () {
+    public int getId () {
         return id;
     }
 
@@ -61,10 +62,6 @@ public class Course {
 
 
     // Setters
-    public void setId (String id) {
-        this.id = id;
-    }
-
     public void setName (String name) {
         this.name = name;
     }
