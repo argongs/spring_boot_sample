@@ -48,9 +48,9 @@ public class TeachesService {
         }
 
         // Hook em' up if they are valid 
-        if (professor == null || professor.isInvalid ())
+        if (professor == null)
             return 1; 
-        else if (course == null || course.isInvalid ())
+        else if (course == null)
             return 2;
 
         teaches = new Teaches (professor, course);

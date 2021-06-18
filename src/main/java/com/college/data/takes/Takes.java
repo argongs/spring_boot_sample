@@ -32,15 +32,6 @@ public class Takes {
     
     }
 
-    public boolean isInvalid () {
-        
-        if (student.isInvalid () || course.isInvalid ())
-            return true;
-        else
-            return false;
-    
-    }
-
     @Override
     public String toString () {
         return String.format("{'student' : %s, 'course' : %s}", student, course);

@@ -48,9 +48,9 @@ public class TakesService {
         }
 
         // Hook em' up if they are valid 
-        if (student == null || student.isInvalid ())
+        if (student == null)
             return 1; 
-        else if (course == null || course.isInvalid ())
+        else if (course == null)
             return 2;
 
         takes = new Takes (student, course);

@@ -31,15 +31,6 @@ public class Teaches {
         this.course = course;
     }
 
-    public boolean isInvalid () {
-        
-        if (professor.isInvalid () || course.isInvalid ())
-            return true;
-        else
-            return false;
-    
-    }
-
     @Override
     public String toString () {
         return String.format("{'professor' : %s, 'course' : %s}", professor, course);

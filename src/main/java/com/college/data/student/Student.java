@@ -11,7 +11,7 @@ public class Student {
     
     @Id
     @GeneratedValue (strategy = GenerationType.AUTO)
-    private int id;
+    private String id;
     @Column (nullable = false)
     private String name;
     @Column (nullable = false)
@@ -19,7 +19,8 @@ public class Student {
 
     public Student () {}
 
-    public Student (String name, int semester) {
+    public Student (String id, String name, int semester) {
+        this.id = id;
         this.name = name;
         this.semester = semester;
     }
@@ -30,25 +31,8 @@ public class Student {
         return output;
     }
 
-    public boolean isInvalid () {
-        
-        try {
-            boolean nameIsAbsent = name.isEmpty () || name.isBlank ();
-            boolean semesterIsInvalid = semester <= 0;
-            
-            if (nameIsAbsent || semesterIsInvalid)
-                return true;
-            else
-                return false;
-        
-        } catch (NullPointerException n) {
-            return true;
-        }
-        
-    }
-
     // Getters
-    public int getId () {
+    public String getId () {
         return id;
     }
 
@@ -62,6 +46,10 @@ public class Student {
 
 
     // Setters
+    public void setId (String id) {
+        this.id = id;
+    }
+    
     public void setName (String name) {
         this.name = name;
     }

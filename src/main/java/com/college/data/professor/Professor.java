@@ -1,5 +1,6 @@
 package com.college.data.professor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -8,7 +9,9 @@ public class Professor {
     
     @Id
     private String id;
+    @Column (nullable = false)
     private String name;
+    @Column (nullable = false)
     private int salary;
 
     public Professor () {}
@@ -23,24 +26,6 @@ public class Professor {
     public String toString () {
         String output = String.format("{'id' : %s, 'name' : %s, 'salary' : %d}", id, name, salary);
         return output;
-    }
-
-    public boolean isInvalid () {
-        
-        try {
-            boolean idIsAbsent = id.isEmpty () || id.isBlank ();
-            boolean nameIsAbsent = name.isEmpty () || name.isBlank ();
-            boolean salaryIsInvalid = salary <= 0;
-            
-            if (idIsAbsent || nameIsAbsent || salaryIsInvalid)
-                return true;
-            else
-                return false;
-        
-        } catch (NullPointerException n) {
-            return true;
-        }
-        
     }
 
     // Getters
