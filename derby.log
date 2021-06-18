@@ -1,13 +1,13 @@
 ----------------------------------------------------------------
-Thu Jun 17 23:23:21 IST 2021:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-017a-1b1b-20d9-000001a15160 
-on database directory memory:/home/sk/playground/fuckJava/springing_basics/data/18d8d519-32cd-4896-b373-a215ada223b4 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@55054057 
-Loaded from file:/home/sk/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
-java.vendor=Ubuntu
-java.runtime.version=11.0.11+9-Ubuntu-0ubuntu2.18.04
-user.dir=/home/sk/playground/fuckJava/springing_basics/data
-os.name=Linux
+Fri Jun 18 16:34:01 IST 2021:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-017a-1eca-bdf1-00000dd05e00 
+on database directory memory:D:\playground\java\spring_boot\spring_boot_sample\1187e852-932d-46ac-98dc-c001de7f5ca2 with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@30946e09 
+Loaded from file:/C:/Users/s2sfgz/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
+java.vendor=AdoptOpenJDK
+java.runtime.version=11.0.11+9
+user.dir=D:\playground\java\spring_boot\spring_boot_sample
+os.name=Windows 10
 os.arch=amd64
-os.version=5.3.0-61-generic
+os.version=10.0
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''

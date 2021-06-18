@@ -1,5 +1,6 @@
 package com.college.data.takes;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,10 +18,10 @@ public class Takes {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @ManyToOne (fetch = FetchType.EAGER)
+    @ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Student student;
     
-    @ManyToOne (fetch = FetchType.EAGER)
+    @ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private Course course;
 
     public Takes () {}
