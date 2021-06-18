@@ -6,5 +6,6 @@ public interface CourseRepository extends CrudRepository<Course, String>{
     
     public Course findByName (String name);
     public void deleteByName (String name);
+    public void deleteAllByProfessorName (String professorName);
     
 }

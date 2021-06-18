@@ -1,6 +1,10 @@
 package com.college.data.professor;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.college.data.course.Course;
+
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +29,7 @@ public class ProfessorService {
     public List<Professor> showProfessors () {
         List <Professor> professors = new ArrayList <Professor> ();
         
-        for (Professor c : professorRepository.findAll()) {
+        for (Professor c : professorRepository.findAll ()) {
             professors.add(c);
         }
 
@@ -33,11 +37,34 @@ public class ProfessorService {
     }
 
     public Professor showProfessorById (String professorId) {
-        return professorRepository.findById(professorId).orElseThrow();
+        return professorRepository.findById (professorId).orElseThrow ();
     }
 
     public Professor showProfessorByName (String professorName) {
-        return professorRepository.findByName(professorName);
+        return professorRepository.findByName (professorName);
+    }
+
+    public List<Course> showCoursesByProfessorId (String professorId) {
+    
+        try {
+            Professor professor = showProfessorById (professorId);    
+            return professor.getCourses ();
+        } catch (NoSuchElementException n) {
+            throw new NoSuchElementException();
+        }
+        
+    }
+
+    public List<Course> showCoursesByProfessorName (String professorName) {
+    
+        Professor professor = showProfessorByName(professorName);
+
+        try {       
+            return professor.getCourses ();
+        } catch (NullPointerException n) {
+            throw new NoSuchElementException();
+        }
+        
     }
 
     // Update Methods

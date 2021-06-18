@@ -1,9 +1,16 @@
 package com.college.data.professor;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.college.data.course.Course;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,6 +26,10 @@ public class Professor {
     @Column (nullable = false)
     private int salary;
 
+    // Foreign key mappings
+    @OneToMany (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Course> courses;
+
     public Professor () {}
 
     public Professor (String id, String name, int salary) {
@@ -29,7 +40,11 @@ public class Professor {
 
     @Override
     public String toString () {
-        String output = String.format("{'id' : %s, 'name' : %s, 'salary' : %d}", id, name, salary);
+        String output = String
+            .format (
+                "{'id' : %s, 'name' : %s, 'salary' : %d, 'courses' : %s}"
+                , id, name, salary, courses
+            );
         return output;
     }
 
@@ -46,6 +61,9 @@ public class Professor {
         return salary;
     }
 
+    public List<Course> getCourses () {
+        return courses;
+    }
 
     // Setters
     public void setId (String id) {
@@ -58,5 +76,9 @@ public class Professor {
 
     public void setSalary (int salary) {
         this.salary = salary;
+    }
+
+    public void setCourses (List<Course> courses) {
+        this.courses = courses;
     }
 }

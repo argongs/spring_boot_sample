@@ -1,9 +1,18 @@
 package com.college.data.course;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+
+import com.college.data.professor.Professor;
+import com.college.data.student.Student;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,17 +28,28 @@ public class Course {
     @Column (nullable = false)
     private int credits;
 
+    // Foreign key mappings
+    @ManyToOne (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Professor professor;
+    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Student> students;
+
     public Course () {}
 
-    public Course (String id, String name, int credits) {
+    public Course (String id, String name, int credits, Professor professor) {
         this.id = id;
         this.name = name;
         this.credits = credits;
+        this.professor = professor;
     }
     
     @Override
     public String toString () {
-        String output = String.format("{'id' : %s, 'name' : %s, 'credits' : %d}", id, name, credits);
+        String output = String
+            .format(
+                "{'id' : %s, 'name' : %s, 'credits' : %d, 'professor' : %s, 'students' : %s}", 
+                id, name, credits, professor, students
+            );
         return output;
     }
 
@@ -46,6 +66,13 @@ public class Course {
         return credits;
     }
 
+    public Professor getProfessor () {
+        return professor;
+    }
+
+    public List<Student> getStudents () {
+        return students;
+    }
 
     // Setters
     public void setId (String id) {
@@ -58,5 +85,13 @@ public class Course {
 
     public void setCredits (int credits) {
         this.credits = credits;
+    }
+
+    public void setProfessor (Professor professor) {
+        this.professor = professor;
+    }
+
+    public void setStudents (List<Student> students) {
+        this.students = students;
     }
 }

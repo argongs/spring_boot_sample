@@ -1,6 +1,10 @@
 package com.college.data.course;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.college.data.student.Student;
+
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +36,7 @@ public class CourseService {
         return courses;
     }
 
-    public Course showCourseById (String courseId) {
+    public Course showCourseById (String courseId) throws NoSuchElementException{
         return courseRepository.findById(courseId).orElseThrow();
     }
 
@@ -40,10 +44,32 @@ public class CourseService {
         return courseRepository.findByName(courseName);
     }
 
+    public List<Student> showStudentsByCourseId (String courseId) {
+
+        try {
+            Course course = showCourseById (courseId);
+            return course.getStudents ();
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException();
+        }
+
+    }
+
+    public List<Student> showStudentsByCourseName (String courseName) {
+
+        try {
+            Course course = showCourseByName (courseName);
+            return course.getStudents ();
+        } catch (NullPointerException n) {
+            throw new NoSuchElementException();
+        }
+
+    }
+
     // Update Methods
 
-    public void updateCourse (Course courses) {
-        courseRepository.save(courses);
+    public void updateCourse (Course course) {
+        courseRepository.save (course);
     }
 
     // Delete Methods
@@ -51,9 +77,13 @@ public class CourseService {
     public void deleteCourseById (String courseId) {
         courseRepository.deleteById (courseId);
     }
-
+    
     public void deleteCourseByName (String courseName) {
         courseRepository.deleteByName (courseName);
+    }
+    
+    public void deleteCourseByProfessorName (String professorName) {
+        courseRepository.deleteAllByProfessorName (professorName);
     }
 
 }

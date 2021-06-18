@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.college.data.student.Student;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 import org.slf4j.Logger;
@@ -38,11 +39,6 @@ public class CourseController {
 
     // Mappings for GET calls to course service
 
-    @RequestMapping ("/data/courses")
-    public List<Course> showCourses () {
-        return courseService.showCourses();
-    }
-
     @RequestMapping ("/data/courses/{course_name_or_id}")
     public Course showCourse (
         @PathVariable ("course_name_or_id")  
@@ -67,6 +63,34 @@ public class CourseController {
         return course;
     }
 
+    @RequestMapping ("/data/courses")
+    public List<Course> showCourses () {
+        return courseService.showCourses ();
+    }
+
+
+    @RequestMapping ("/data/course/{course_id_or_name}/courses")
+    public List<Student> showStudentsByCourseIdOrName (
+        @PathVariable ("course_id_or_name") 
+        String courseIdOrName
+    ) {
+        List<Student> students;
+        
+        try {
+            // Assume 'courseIdOrName' to represent course id, intially
+            students = courseService.showStudentsByCourseId (courseIdOrName);    
+        } catch (NoSuchElementException e1) {
+            try {
+                // Once course id assumption fails, then assume 'courseIdOrName' to be course name
+                students = courseService.showStudentsByCourseName (courseIdOrName);
+            } catch (NoSuchElementException e2) {
+                // Once both the assumptions fail, then return null
+                students = null;
+            }
+        }
+        
+        return students;
+    }
 
     // Mappings for POST calls to course service
     
@@ -94,8 +118,23 @@ public class CourseController {
     @RequestMapping (method = RequestMethod.PUT, value = "/data/course")
     public ResponseEntity<String> updateCourse (@Valid @RequestBody Course course) {
         
-        courseService.updateCourse (course);            
-        return ResponseEntity.ok (course.toString ());
+        Course oldDetails = courseService.showCourseByName (course.getName ());
+        if (oldDetails != null)
+        {
+            course.setStudents (oldDetails.getStudents ());
+            courseService.updateCourse (course);            
+            return ResponseEntity.ok (course.toString ());    
+        } else {
+            return ResponseEntity
+                .status (HttpStatus.NOT_FOUND)
+                .body (
+                    String
+                    .format(
+                        "Couldn't find a course with the name '%s'", 
+                        course.getName ()
+                    )
+                );
+        }
 
     }
 

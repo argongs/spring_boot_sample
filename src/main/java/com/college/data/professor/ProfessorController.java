@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.college.data.course.Course;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 import org.slf4j.Logger;
@@ -67,13 +68,35 @@ public class ProfessorController {
         return professor;
     }
 
+    @RequestMapping ("/data/professor/{professor_id_or_name}/courses")
+    public List<Course> showCoursesByProfessorIdOrName (
+        @PathVariable ("professor_id_or_name") 
+        String professorIdOrName
+    ) {
+        List<Course> courses;
+        
+        try {
+            // Assume 'professorIdOrName' to represent professor id, intially
+            courses = professorService.showCoursesByProfessorId (professorIdOrName);    
+        } catch (NoSuchElementException e1) {
+            try {
+                // Once professor id assumption fails, then assume 'professorIdOrName' to be professor name
+                courses = professorService.showCoursesByProfessorName (professorIdOrName);
+            } catch (NoSuchElementException e2) {
+                // Once both the assumptions fail, then return null
+                courses = null;
+            }
+        }
+        
+        return courses;
+    }
 
     // Mappings for POST calls to professor service
     
     @RequestMapping (method = RequestMethod.POST, value = "/data/professor")
     public ResponseEntity<String> addProfessor (@Valid @RequestBody Professor professor) {
 
-        professorService.addProfessor (professor);            
+        professorService.addProfessor (professor);       
         return ResponseEntity.ok (professor.toString ());
     
     }
@@ -94,8 +117,23 @@ public class ProfessorController {
     @RequestMapping (method = RequestMethod.PUT, value = "/data/professor")
     public ResponseEntity<String> updateProfessor (@Valid @RequestBody Professor professor) {
         
-        professorService.updateProfessor (professor);            
-        return ResponseEntity.ok (professor.toString ());
+        Professor oldDetails = professorService.showProfessorByName (professor.getName ());
+        if (oldDetails != null)
+        {
+            professor.setCourses (oldDetails.getCourses ());
+            professorService.updateProfessor (professor);            
+            return ResponseEntity.ok (professor.toString ());    
+        } else {
+            return ResponseEntity
+                .status (HttpStatus.NOT_FOUND)
+                .body (
+                    String
+                    .format(
+                        "Couldn't find a professor with the name '%s'", 
+                        professor.getName ()
+                    )
+                );
+        }
 
     }
 
