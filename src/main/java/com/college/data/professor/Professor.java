@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import com.college.data.course.Course;
@@ -27,7 +28,8 @@ public class Professor {
     private int salary;
 
     // Foreign key mappings
-    @OneToMany (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn (name = "professor_fk")
     private List<Course> courses;
 
     public Professor () {}

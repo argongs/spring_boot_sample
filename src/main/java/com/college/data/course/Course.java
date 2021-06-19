@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
@@ -29,9 +30,10 @@ public class Course {
     private int credits;
 
     // Foreign key mappings
-    @ManyToOne (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn (name = "professor_fk", insertable = false, updatable = false)
     private Professor professor;
-    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany (cascade = CascadeType.ALL)
     private List<Student> students;
 
     public Course () {}

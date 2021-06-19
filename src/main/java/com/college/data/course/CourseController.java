@@ -7,6 +7,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.college.data.professor.Professor;
+import com.college.data.professor.ProfessorService;
 import com.college.data.student.Student;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
@@ -31,6 +33,8 @@ public class CourseController {
     
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private ProfessorService professorService;
     private Logger logger;
 
     public CourseController () {
@@ -69,7 +73,7 @@ public class CourseController {
     }
 
 
-    @RequestMapping ("/data/course/{course_id_or_name}/courses")
+    @RequestMapping ("/data/courses/{course_id_or_name}/students")
     public List<Student> showStudentsByCourseIdOrName (
         @PathVariable ("course_id_or_name") 
         String courseIdOrName
@@ -94,24 +98,62 @@ public class CourseController {
 
     // Mappings for POST calls to course service
     
-    @RequestMapping (method = RequestMethod.POST, value = "/data/course")
-    public ResponseEntity<String> addCourse (@Valid @RequestBody Course course) {
+    // POST calls won't be needed for courses, since the additions to the course will be done 
+    // only through the Professor entity
 
-        courseService.addCourse (course);            
-        return ResponseEntity.ok (course.toString ());
-    
-    }
+    // @RequestMapping (method = RequestMethod.POST, value = "/data/course")
+    // public ResponseEntity<String> addCourse (@Valid @RequestBody Course course) {
 
-    @RequestMapping (method = RequestMethod.POST, value = "/data/courses")
-    public ResponseEntity<String> addCourses (@RequestBody List<@Valid Course> courses) {
+    //     Professor professor = course.getProfessor ();
+
+    //     if (professor != null)
+    //     {
+    //         if (professor.getId () != null)
+    //         {
+    //             try {
+    //                 professor = professorService.showProfessorById (professor.getId ());    
+    //                 course.setProfessor (professor);
+    //             } catch (NoSuchElementException n) {
+    //                 return ResponseEntity
+    //                 .status(HttpStatus.NOT_ACCEPTABLE)
+    //                 .body(String.format("Professor with ID '%s' doesn't exist", professor.getId ()));        
+    //             }
+    //         } else {
+    //             String professorName = professor.getName ();
+    //             professor = professorService.showProfessorByName (professorName);
+                
+    //             if (professor != null) {
+    //                 course.setProfessor (professor);
+    //             } else {
+    //                 return ResponseEntity
+    //                 .status(HttpStatus.NOT_ACCEPTABLE)
+    //                 .body(String.format("Professor with name '%s' doesn't exist", professorName));
+    //             }
+    //         }
+    //         courseService.addCourse (course);            
+    //         return ResponseEntity.ok (course.toString ());
+    //     } else {
+    //         return ResponseEntity
+    //         .status(HttpStatus.NOT_ACCEPTABLE)
+    //         .body("'professor' field cannot be kept empty or null");
+    //     }
         
-        for (Course course : courses) {
-                courseService.addCourse (course);            
-        }    
+    // }
 
-        return ResponseEntity.ok (courses.toString ());
+    // @RequestMapping (method = RequestMethod.POST, value = "/data/courses")
+    // public ResponseEntity<String> addCourses (@RequestBody List<@Valid Course> courses) {
+        
+    //     ResponseEntity<String> response;
+        
+    //     for (Course course : courses) {
+    //         response = addCourse (course);
+    //         if (response.getStatusCode () != HttpStatus.OK)
+    //             return response;            
+    //     }    
+
+    //     return ResponseEntity.ok (courses.toString ());
     
-    }
+    // }
 
     // Mappings for PUT calls to course service
     

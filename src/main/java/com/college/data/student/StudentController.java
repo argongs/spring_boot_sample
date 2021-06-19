@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.college.data.course.Course;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 import org.slf4j.Logger;
@@ -38,11 +39,6 @@ public class StudentController {
 
     // Mappings for GET calls to student service
 
-    @RequestMapping ("/data/students")
-    public List<Student> showStudents () {
-        return studentService.showStudents();
-    }
-
     @RequestMapping ("/data/students/{student_name_or_id}")
     public Student showStudent (
         @PathVariable ("student_name_or_id")  
@@ -65,6 +61,34 @@ public class StudentController {
         }
         
         return student;
+    }
+
+    @RequestMapping ("/data/students")
+    public List<Student> showStudents () {
+        return studentService.showStudents();
+    }
+
+    @RequestMapping ("/data/students/{student_id_or_name}/courses")
+    public List<Course> showCoursesByStudentIdOrName (
+        @PathVariable ("student_id_or_name")
+        String studentIdOrName
+    ) {
+        List<Course> courses;
+        
+        try {
+            // Assume 'studentIdOrName' to represent student id, intially
+            courses = studentService.showCoursesByStudentId (studentIdOrName);    
+        } catch (NoSuchElementException e1) {
+            try {
+                // Once student id assumption fails, then assume 'studentIdOrName' to be student name
+                courses = studentService.showCoursesByStudentName (studentIdOrName);
+            } catch (NoSuchElementException e2) {
+                // Once both the assumptions fail, then return null
+                courses = null;
+            }
+        }
+        
+        return courses;
     }
 
 
@@ -94,8 +118,23 @@ public class StudentController {
     @RequestMapping (method = RequestMethod.PUT, value = "/data/student")
     public ResponseEntity<String> updateStudent (@Valid @RequestBody Student student) {
         
-        studentService.updateStudent (student);            
-        return ResponseEntity.ok (student.toString ());
+        Student oldDetails = studentService.showStudentByName (student.getName ());
+        if (oldDetails != null)
+        {
+            student.setCourses (oldDetails.getCourses ());
+            studentService.updateStudent (student);            
+            return ResponseEntity.ok (student.toString ());    
+        } else {
+            return ResponseEntity
+                .status (HttpStatus.NOT_FOUND)
+                .body (
+                    String
+                    .format(
+                        "Couldn't find a student with the name '%s'", 
+                        student.getName ()
+                    )
+                );
+        }
 
     }
 

@@ -1,6 +1,10 @@
 package com.college.data.student;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.college.data.course.Course;
+
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,27 @@ public class StudentService {
 
     public Student showStudentByName (String studentName) {
         return studentRepository.findByName(studentName);
+    }
+
+    public List<Course> showCoursesByStudentId (String studentId) throws NoSuchElementException {
+
+        try {
+            Student student = showStudentById (studentId);
+            return student.getCourses ();
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException();
+        }
+    }
+
+    public List<Course> showCoursesByStudentName (String studentName) throws NoSuchElementException {
+       
+        try {
+            Student student = showStudentByName (studentName);
+            return student.getCourses ();    
+        } catch (NullPointerException e) {
+            throw new NoSuchElementException();
+        }
+        
     }
 
     // Update Methods

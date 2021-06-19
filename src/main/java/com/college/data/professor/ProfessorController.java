@@ -64,11 +64,11 @@ public class ProfessorController {
                 professor = null;
             }
         }
-        
+        logger.info(professor.getCourses().toString());
         return professor;
     }
 
-    @RequestMapping ("/data/professor/{professor_id_or_name}/courses")
+    @RequestMapping ("/data/professors/{professor_id_or_name}/courses")
     public List<Course> showCoursesByProfessorIdOrName (
         @PathVariable ("professor_id_or_name") 
         String professorIdOrName
