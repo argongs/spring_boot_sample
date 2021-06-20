@@ -5,13 +5,13 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import com.college.data.course.Course;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,8 +28,9 @@ public class Professor {
     private int salary;
 
     // Foreign key mappings
-    @OneToMany (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany (cascade = CascadeType.ALL)
     @JoinColumn (name = "professor_fk")
+    @JsonManagedReference
     private List<Course> courses;
 
     public Professor () {}
@@ -40,12 +41,19 @@ public class Professor {
         this.salary = salary;
     }
 
+    public Professor (Professor oldDetails, Professor newDetails) {
+        this.id = newDetails.getId () == null ? oldDetails.getId () : newDetails.getId ();
+        this.name = newDetails.getName () == null ? oldDetails.getName () : newDetails.getName ();
+        this.salary = newDetails.getSalary () == 0 ? oldDetails.getSalary () : newDetails.getSalary ();
+        this.courses = newDetails.getCourses () == null ? oldDetails.getCourses () : newDetails.getCourses ();
+    }
+
     @Override
     public String toString () {
         String output = String
             .format (
-                "{'id' : %s, 'name' : %s, 'salary' : %d, 'courses' : %s}"
-                , id, name, salary, courses
+                "{'id' : %s, 'name' : %s, 'salary' : %d}"
+                , id, name, salary
             );
         return output;
     }

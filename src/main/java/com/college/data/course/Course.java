@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -14,6 +13,7 @@ import javax.persistence.ManyToOne;
 
 import com.college.data.professor.Professor;
 import com.college.data.student.Student;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -30,8 +30,9 @@ public class Course {
     private int credits;
 
     // Foreign key mappings
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn (name = "professor_fk", insertable = false, updatable = false)
+    @JsonBackReference
     private Professor professor;
     @ManyToMany (cascade = CascadeType.ALL)
     private List<Student> students;
@@ -49,8 +50,8 @@ public class Course {
     public String toString () {
         String output = String
             .format(
-                "{'id' : %s, 'name' : %s, 'credits' : %d, 'professor' : %s, 'students' : %s}", 
-                id, name, credits, professor, students
+                "{'id' : %s, 'name' : %s, 'credits' : %d}", 
+                id, name, credits
             );
         return output;
     }

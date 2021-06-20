@@ -114,37 +114,30 @@ public class ProfessorController {
 
     // Mappings for PUT calls to professor service
     
-    @RequestMapping (method = RequestMethod.PUT, value = "/data/professor")
-    public ResponseEntity<String> updateProfessor (@Valid @RequestBody Professor professor) {
+    @RequestMapping (method = RequestMethod.PUT, value = "/data/professor/{professor_id_or_name}")
+    public ResponseEntity<String> updateProfessor (
+        @Valid 
+        @PathVariable ("professor_id_or_name") String professorIdOrName,
+        @RequestBody Professor newDetails) {
         
-        Professor oldDetails = professorService.showProfessorByName (professor.getName ());
+        Professor oldDetails = showProfessor (professorIdOrName);
         if (oldDetails != null)
         {
-            professor.setCourses (oldDetails.getCourses ());
-            professorService.updateProfessor (professor);            
-            return ResponseEntity.ok (professor.toString ());    
+            Professor updatedDetails = new Professor (oldDetails, newDetails);
+            professorService.updateProfessor (updatedDetails);
+            return ResponseEntity.ok (updatedDetails.toString ());    
         } else {
             return ResponseEntity
                 .status (HttpStatus.NOT_FOUND)
                 .body (
                     String
                     .format(
-                        "Couldn't find a professor with the name '%s'", 
-                        professor.getName ()
+                        "Couldn't find a professor with the name/id '%s'", 
+                        professorIdOrName
                     )
                 );
         }
 
-    }
-
-    @RequestMapping (method = RequestMethod.PUT, value = "/data/professors")
-    public ResponseEntity<String> updateProfessors (@RequestBody List<@Valid Professor> professors) {
-
-        for (Professor professor : professors) {
-            professorService.updateProfessor (professor);
-        }    
-               
-        return ResponseEntity.ok (professors.toString ());
     }
 
     // Mappings for DELETE calls to professor service
