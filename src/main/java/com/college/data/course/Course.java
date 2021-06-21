@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import com.college.data.professor.Professor;
 import com.college.data.student.Student;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -33,7 +34,8 @@ public class Course {
     @JoinColumn (name = "professor_id", nullable = false)
     @JsonBackReference
     private Professor professor;
-    @ManyToMany ()
+    @ManyToMany (mappedBy = "courses")
+    @JsonIgnore
     private List<Student> students;
 
     public Course () {}
