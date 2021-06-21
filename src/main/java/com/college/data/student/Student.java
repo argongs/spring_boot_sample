@@ -5,9 +5,9 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import com.college.data.course.Course;
@@ -27,10 +27,18 @@ public class Student {
     private int semester;
 
     // Foreign key mapping
-    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany (cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable (name = "student_courses")
     private List<Course> courses;
 
     public Student () {}
+
+    public Student (Student oldDetails, Student newDetails) {
+        this.id = oldDetails.getId ();
+        this.name = newDetails.getName () == null ? oldDetails.getName () : newDetails.getName ();
+        this.semester = newDetails.getSemester () == 0 ? oldDetails.getSemester () : newDetails.getSemester ();
+        this.courses = newDetails.getCourses () == null ? oldDetails.getCourses () : newDetails.getCourses ();
+    }
 
     public Student (String id, String name, int semester, List<Course> courses) {
         this.id = id;
@@ -43,8 +51,8 @@ public class Student {
     public String toString () {
         String output = String
             .format(
-                "{'id' : %s, 'name' : %s, 'semester' : %d, 'courses' : %s}"
-                , id, name, semester, courses
+                "{'id' : %s, 'name' : %s, 'semester' : %d}"
+                , id, name, semester
             );
         return output;
     }

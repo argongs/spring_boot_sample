@@ -1,5 +1,6 @@
 package com.college.data.student;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.college.data.course.Course;
+import com.college.data.course.CourseService;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 import org.slf4j.Logger;
@@ -31,7 +33,20 @@ public class StudentController {
     
     @Autowired
     private StudentService studentService;
+    @Autowired
+    private CourseService courseService;
     private Logger logger;
+
+    private List<Course> loadCourseDetails (List<Course> optedCourses) {
+        Course course;
+        List<Course> finalisedCourses = new LinkedList<Course>();
+        for(Course optedCourse : optedCourses) {
+            course = courseService.showCourseByName(optedCourse.getName ());
+            if (course != null)
+                finalisedCourses.add(course);
+        }
+        return finalisedCourses;
+    }
 
     public StudentController () {
         logger = LoggerFactory.getLogger(StudentController.class);
@@ -59,7 +74,7 @@ public class StudentController {
                 student = null;
             }
         }
-        
+
         return student;
     }
 
@@ -97,6 +112,12 @@ public class StudentController {
     @RequestMapping (method = RequestMethod.POST, value = "/data/student")
     public ResponseEntity<String> addStudent (@Valid @RequestBody Student student) {
 
+        if (student.getCourses () != null) {
+            List<Course> optedCourses = student.getCourses ();
+            List<Course> finalisedCourses = loadCourseDetails(optedCourses);
+            student.setCourses(finalisedCourses);
+        }
+        
         studentService.addStudent (student);            
         return ResponseEntity.ok (student.toString ());
     
@@ -115,37 +136,35 @@ public class StudentController {
 
     // Mappings for PUT calls to student service
     
-    @RequestMapping (method = RequestMethod.PUT, value = "/data/student")
-    public ResponseEntity<String> updateStudent (@Valid @RequestBody Student student) {
+    @RequestMapping (method = RequestMethod.PUT, value = "/data/student/{student_id_or_name}")
+    public ResponseEntity<String> updateStudent (
+        @Valid 
+        @PathVariable ("student_id_or_name") String studentIdOrName,
+        @RequestBody Student newDetails
+    ) {
         
-        Student oldDetails = studentService.showStudentByName (student.getName ());
+        Student oldDetails = showStudent (studentIdOrName);
         if (oldDetails != null)
         {
-            student.setCourses (oldDetails.getCourses ());
-            studentService.updateStudent (student);            
-            return ResponseEntity.ok (student.toString ());    
+            List<Course> optedCourses = newDetails.getCourses ();
+            List<Course> finalisedCourses = loadCourseDetails(optedCourses);
+            newDetails.setCourses(finalisedCourses);
+
+            Student updatedDetails = new Student (oldDetails, newDetails);
+            studentService.updateStudent (updatedDetails);
+            return ResponseEntity.ok (updatedDetails.toString ());    
         } else {
             return ResponseEntity
                 .status (HttpStatus.NOT_FOUND)
                 .body (
                     String
                     .format(
-                        "Couldn't find a student with the name '%s'", 
-                        student.getName ()
+                        "Couldn't find a student with the name/id '%s'", 
+                        studentIdOrName
                     )
                 );
         }
 
-    }
-
-    @RequestMapping (method = RequestMethod.PUT, value = "/data/students")
-    public ResponseEntity<String> updateStudents (@RequestBody List<@Valid Student> students) {
-
-        for (Student student : students) {
-            studentService.updateStudent (student);
-        }    
-               
-        return ResponseEntity.ok (students.toString ());
     }
 
     // Mappings for DELETE calls to student service
