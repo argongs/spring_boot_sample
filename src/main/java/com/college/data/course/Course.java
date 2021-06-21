@@ -2,7 +2,6 @@ package com.college.data.course;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,10 +30,10 @@ public class Course {
 
     // Foreign key mappings
     @ManyToOne
-    @JoinColumn (name = "professor_fk", insertable = false, updatable = false)
+    @JoinColumn (name = "professor_id", nullable = false)
     @JsonBackReference
     private Professor professor;
-    @ManyToMany (cascade = CascadeType.ALL)
+    @ManyToMany ()
     private List<Student> students;
 
     public Course () {}

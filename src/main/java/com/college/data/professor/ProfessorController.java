@@ -64,8 +64,8 @@ public class ProfessorController {
                 professor = null;
             }
         }
-        logger.info(professor.getCourses().toString());
         return professor;
+    
     }
 
     @RequestMapping ("/data/professors/{professor_id_or_name}/courses")
@@ -182,7 +182,7 @@ public class ProfessorController {
     public ResponseEntity<String> handleMismatchedInputException (
         MismatchedInputException exception
     ) {
-        logger.info ("Recieved data with incorrect syntax");
+        logger.info ("Recieved data with incorrect syntax.");
         return ResponseEntity
             .status (HttpStatus.BAD_REQUEST)
             .body (exception.getMessage());   
@@ -193,7 +193,7 @@ public class ProfessorController {
     public ResponseEntity<String> handleDataIntegrityViolationException (
         DataIntegrityViolationException exception
     ) {
-        logger.info ("Recieved data in clear violation with data integrity");
+        logger.info ("Recieved data in clear violation with data integrity.");
         return ResponseEntity
             .status (HttpStatus.BAD_REQUEST)
             .body (exception.getMessage());
@@ -204,7 +204,7 @@ public class ProfessorController {
     public ResponseEntity<String> handleHttpMessageNotReadableException(
         HttpMessageNotReadableException exception
     ) {
-        logger.info ("Failed to read the contents of the request");
+        logger.info ("Failed to read the contents of the request.");
         return ResponseEntity
             .status (HttpStatus.BAD_REQUEST)
             .body (exception.getMessage());
