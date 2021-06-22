@@ -1,5 +1,6 @@
 package com.college.data.professor;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.college.data.course.Course;
+import com.college.data.course.CourseService;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 import org.slf4j.Logger;
@@ -31,6 +33,8 @@ public class ProfessorController {
     
     @Autowired
     private ProfessorService professorService;
+    @Autowired
+    private CourseService courseService;
     private Logger logger;
 
     public ProfessorController () {
@@ -112,6 +116,34 @@ public class ProfessorController {
     
     }
 
+    @RequestMapping (method = RequestMethod.POST, value = "/data/professors/{professor_id_or_name}")
+    public ResponseEntity<String> addCourseByProfessor (
+        @PathVariable ("professor_id_or_name") String professorIdOrName,
+        @RequestBody 
+        @Valid Course course
+    ) {
+        Professor professor = showProfessor (professorIdOrName);
+        if (professor != null)
+        {
+            List<Course> courses = professor.getCourses ();
+            course.setProfessor (professor);
+            courses.add (course);
+            professor.setCourses (courses);
+            professorService.updateProfessor (professor);
+            return ResponseEntity.ok (courses.toString ());    
+        } else {
+            return ResponseEntity
+                .status (HttpStatus.NOT_FOUND)
+                .body (
+                    String
+                    .format(
+                        "Couldn't find a professor with the name/id '%s'", 
+                        professorIdOrName
+                    )
+                );
+        }
+    }
+
     // Mappings for PUT calls to professor service
     
     @RequestMapping (method = RequestMethod.PUT, value = "/data/professor/{professor_id_or_name}")
@@ -139,6 +171,45 @@ public class ProfessorController {
         }
 
     }
+
+    @RequestMapping (method = RequestMethod.PUT, value = "/data/professors/{professor_id_or_name}/courses/{course_id_or_name}")
+    public ResponseEntity<String> updateCourseByProfessor (
+        @Valid 
+        @PathVariable ("professor_id_or_name") String professorIdOrName,
+        @PathVariable ("course_id_or_name") String courseIdOrName,
+        @RequestBody Course newDetails
+    ) {
+        
+        Professor professor = showProfessor (professorIdOrName);
+        if (professor != null)
+        {
+            List<Course> courses = professor.getCourses ();
+            List<Course> updatedCourses = new LinkedList<Course>();
+            
+            for (Course course : courses) {
+                if (course.getId ().equals (courseIdOrName) || course.getName ().equals (courseIdOrName)) {
+                    course = new Course (course, newDetails);
+                }
+                updatedCourses.add(course); 
+            }
+            
+            professor.setCourses (updatedCourses);
+            professorService.updateProfessor (professor);
+            return ResponseEntity.ok (updatedCourses.toString ());    
+        } else {
+            return ResponseEntity
+                .status (HttpStatus.NOT_FOUND)
+                .body (
+                    String
+                    .format(
+                        "Couldn't find a professor with the name/id '%s'", 
+                        professorIdOrName
+                    )
+                );
+        }
+
+    }
+
 
     // Mappings for DELETE calls to professor service
 
@@ -172,6 +243,47 @@ public class ProfessorController {
 
         for (String professorNameOrId : professorNameOrIds)
             deleteProfessor (professorNameOrId);
+
+    }
+
+    @RequestMapping (method = RequestMethod.DELETE, value = "/data/professors/{professor_id_or_name}/courses/{course_id_or_name}")
+    public ResponseEntity<String> deleteCourseByProfessor (
+        @PathVariable ("professor_id_or_name") String professorIdOrName,
+        @PathVariable ("course_id_or_name") String courseIdOrName
+    ) {
+        
+        Professor professor = showProfessor (professorIdOrName);
+        if (professor != null)
+        {
+            Course courseToRemove = null;
+            List<Course> originalCourseList = professor.getCourses ();
+            List<Course> modifiedCourseList = new LinkedList<Course>();
+            
+            for (Course course : originalCourseList) {
+                if (course.getId ().equals (courseIdOrName) || course.getName ().equals (courseIdOrName)) {
+                    courseToRemove = course;
+                    continue;
+                }
+                modifiedCourseList.add (course); 
+            }
+            
+            if (courseToRemove != null) {
+                professor.setCourses (modifiedCourseList);
+                professorService.updateProfessor (professor);
+                courseService.deleteCourseById(courseToRemove.getId ());
+            }  
+            return ResponseEntity.ok (professor.getCourses().toString ());    
+        } else {
+            return ResponseEntity
+                .status (HttpStatus.NOT_FOUND)
+                .body (
+                    String
+                    .format(
+                        "Couldn't find a professor with the name/id '%s'", 
+                        professorIdOrName
+                    )
+                );
+        }
 
     }
 
