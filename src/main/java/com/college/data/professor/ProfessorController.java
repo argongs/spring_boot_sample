@@ -270,6 +270,13 @@ public class ProfessorController {
             if (courseToRemove != null) {
                 professor.setCourses (modifiedCourseList);
                 professorService.updateProfessor (professor);
+                /* 
+                * Don't forget to actually remove the course entity from the database through
+                * the course service otherwise, it won't be actually removed from the database.
+                * The following line effectively removes the link b/w. the course to be removed
+                * and the corresponding professor entity instance. Directly removing it will lead
+                * to some reference errors
+                */
                 courseService.deleteCourseById(courseToRemove.getId ());
             }  
             return ResponseEntity.ok (professor.getCourses().toString ());    
