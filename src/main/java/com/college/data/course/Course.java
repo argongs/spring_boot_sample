@@ -40,6 +40,14 @@ public class Course {
 
     public Course () {}
 
+    public Course (Course oldDetails, Course newDetails) {
+        this.id = oldDetails.getId ();
+        this.name = newDetails.getName () == null ? oldDetails.getName () : newDetails.getName ();
+        this.credits = newDetails.getCredits () == 0 ? oldDetails.getCredits () : newDetails.getCredits ();
+        this.professor = oldDetails.getProfessor ();
+        this.students = oldDetails.getStudents ();
+    }
+
     public Course (String id, String name, int credits, Professor professor) {
         this.id = id;
         this.name = name;

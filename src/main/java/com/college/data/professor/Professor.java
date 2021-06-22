@@ -43,7 +43,7 @@ public class Professor {
         this.id = oldDetails.getId ();
         this.name = newDetails.getName () == null ? oldDetails.getName () : newDetails.getName ();
         this.salary = newDetails.getSalary () == 0 ? oldDetails.getSalary () : newDetails.getSalary ();
-        this.courses = newDetails.getCourses () == null ? oldDetails.getCourses () : newDetails.getCourses ();
+        this.courses = oldDetails.getCourses ();
     }
 
     @Override
