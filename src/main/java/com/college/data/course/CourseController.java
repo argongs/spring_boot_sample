@@ -14,10 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class CourseController {
@@ -32,7 +34,12 @@ public class CourseController {
 
     // Mappings for GET calls to course service
 
-    @RequestMapping ("/data/courses/{course_name_or_id}")
+    @ApiOperation (
+        value = "Look up all courses by given id or name",
+        notes = "Provide an id or name in order to lookup for a course",
+        response = Course.class
+    )
+    @GetMapping ("/data/courses/{course_name_or_id}") 
     public Course showCourse (
         @PathVariable ("course_name_or_id")  
         String courseNameOrId
@@ -56,13 +63,21 @@ public class CourseController {
         return course;
     }
 
-    @RequestMapping ("/data/courses")
+    @ApiOperation (
+        value = "Obtain all the courses",
+        response = List.class
+    )
+    @GetMapping ("/data/courses")
     public List<Course> showCourses () {
         return courseService.showCourses ();
     }
 
-
-    @RequestMapping ("/data/courses/{course_id_or_name}/students")
+    @ApiOperation (
+        value = "Look up all the students undertaking a specific course",
+        notes = "Provide an id or name in order to lookup for students undertaking a specific course",
+        response = List.class
+    )
+    @GetMapping ("/data/courses/{course_id_or_name}/students")
     public List<Student> showStudentsByCourseIdOrName (
         @PathVariable ("course_id_or_name") 
         String courseIdOrName

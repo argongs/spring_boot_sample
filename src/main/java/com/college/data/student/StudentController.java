@@ -20,13 +20,17 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class StudentController {
@@ -54,7 +58,12 @@ public class StudentController {
 
     // Mappings for GET calls to student service
 
-    @RequestMapping ("/data/students/{student_name_or_id}")
+    @ApiOperation (
+        value = "Search students by a given id or name",
+        notes = "Provide an id or name in order to lookup for a student",
+        response = Student.class
+    )
+    @GetMapping ("/data/students/{student_name_or_id}")
     public Student showStudent (
         @PathVariable ("student_name_or_id")  
         String studentNameOrId
@@ -78,12 +87,21 @@ public class StudentController {
         return student;
     }
 
-    @RequestMapping ("/data/students")
+    @ApiOperation (
+        value = "Obtain details of all students",
+        response = List.class
+    )
+    @GetMapping ("/data/students")
     public List<Student> showStudents () {
         return studentService.showStudents();
     }
 
-    @RequestMapping ("/data/students/{student_id_or_name}/courses")
+    @ApiOperation (
+        value = "Obtain all the courses taken up by a student with given id or name",
+        notes = "Provide an id or name in order to search for a specific student",
+        response = List.class
+    )
+    @GetMapping ("/data/students/{student_id_or_name}/courses")
     public List<Course> showCoursesByStudentIdOrName (
         @PathVariable ("student_id_or_name")
         String studentIdOrName
@@ -109,7 +127,12 @@ public class StudentController {
 
     // Mappings for POST calls to student service
     
-    @RequestMapping (method = RequestMethod.POST, value = "/data/student")
+    @ApiOperation (
+        value = "Add a new student into the database",
+        notes = "Provide all the required details for the student in the request",
+        response = ResponseEntity.class
+    )
+    @PostMapping ("/data/student")
     public ResponseEntity<String> addStudent (@Valid @RequestBody Student student) {
 
         if (student.getCourses () != null) {
@@ -123,7 +146,12 @@ public class StudentController {
     
     }
 
-    @RequestMapping (method = RequestMethod.POST, value = "/data/students")
+    @ApiOperation (
+        value = "Add an array of students to the database",
+        notes = "Provide all the required details for each and every student",
+        response = ResponseEntity.class
+    )
+    @PostMapping ("/data/students")
     public ResponseEntity<String> addStudents (@RequestBody List<@Valid Student> students) {
         
         for (Student student : students) {
@@ -136,7 +164,12 @@ public class StudentController {
 
     // Mappings for PUT calls to student service
     
-    @RequestMapping (method = RequestMethod.PUT, value = "/data/student/{student_id_or_name}")
+    @ApiOperation (
+        value = "Update details of a specific student",
+        notes = "Provide an id or name in order to update details for a specific student",
+        response = ResponseEntity.class
+    )
+    @PutMapping ("/data/student/{student_id_or_name}")
     public ResponseEntity<String> updateStudent (
         @Valid 
         @PathVariable ("student_id_or_name") String studentIdOrName,
@@ -169,7 +202,12 @@ public class StudentController {
 
     // Mappings for DELETE calls to student service
 
-    @RequestMapping (method = RequestMethod.DELETE, value = "/data/students/{student_name_or_id}")
+    @ApiOperation (
+        value = "Delete a student with a given id or name",
+        notes = "Provide an id or name in order to delete a specific student",
+        response = void.class
+    )
+    @DeleteMapping ("/data/students/{student_name_or_id}")
     public void deleteStudent (
         @PathVariable ("student_name_or_id")
         String studentNameOrId 
@@ -191,7 +229,12 @@ public class StudentController {
 
     }
 
-    @RequestMapping (method = RequestMethod.DELETE, value = "/data/students")
+    @ApiOperation (
+        value = "Delete an array of students by given id or name",
+        notes = "Provide an array of id or name in the request to delete the corresponding students",
+        response = Course.class
+    )
+    @DeleteMapping ("/data/students")
     public void deleteStudents (
         @RequestBody 
         List<@NotBlank @NotNull String> studentNameOrIds

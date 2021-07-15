@@ -20,13 +20,17 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class ProfessorController {
@@ -43,12 +47,21 @@ public class ProfessorController {
 
     // Mappings for GET calls to professor service
 
-    @RequestMapping ("/data/professors")
+    @ApiOperation (
+        value = "Obtain details of all the professors",
+        response = List.class
+    )
+    @GetMapping ("/data/professors")
     public List<Professor> showProfessors () {
         return professorService.showProfessors();
     }
 
-    @RequestMapping ("/data/professors/{professor_name_or_id}")
+    @ApiOperation (
+        value = "Search for a professor by given id or name",
+        notes = "Provide an id or name in order to lookup for a professor",
+        response = Professor.class
+    )
+    @GetMapping ("/data/professors/{professor_name_or_id}")
     public Professor showProfessor (
         @PathVariable ("professor_name_or_id")  
         String professorNameOrId
@@ -72,7 +85,12 @@ public class ProfessorController {
     
     }
 
-    @RequestMapping ("/data/professors/{professor_id_or_name}/courses")
+    @ApiOperation (
+        value = "Obtain details of all courses taught by a professor of given id or name",
+        notes = "Provide an id or name for the professor in order to lookup for courses taught by that professor",
+        response = List.class
+    )
+    @GetMapping ("/data/professors/{professor_id_or_name}/courses")
     public List<Course> showCoursesByProfessorIdOrName (
         @PathVariable ("professor_id_or_name") 
         String professorIdOrName
@@ -97,7 +115,12 @@ public class ProfessorController {
 
     // Mappings for POST calls to professor service
     
-    @RequestMapping (method = RequestMethod.POST, value = "/data/professor")
+    @ApiOperation (
+        value = "Add a professor to the database",
+        notes = "Provide all the required details of a professor in the request",
+        response = ResponseEntity.class
+    )
+    @PostMapping ("/data/professor")
     public ResponseEntity<String> addProfessor (@Valid @RequestBody Professor professor) {
 
         professorService.addProfessor (professor);       
@@ -105,7 +128,12 @@ public class ProfessorController {
     
     }
 
-    @RequestMapping (method = RequestMethod.POST, value = "/data/professors")
+    @ApiOperation (
+        value = "Add an array of professors into the database",
+        notes = "Provide all the required details for each and every professor",
+        response = ResponseEntity.class
+    )
+    @PostMapping ("/data/professors")
     public ResponseEntity<String> addProfessors (@RequestBody List<@Valid Professor> professors) {
         
         for (Professor professor : professors) {
@@ -116,7 +144,12 @@ public class ProfessorController {
     
     }
 
-    @RequestMapping (method = RequestMethod.POST, value = "/data/professors/{professor_id_or_name}")
+    @ApiOperation (
+        value = "Add a new course to the list of courses taught by a professor of given id or name",
+        notes = "Provide an id or name of a professor to add course under the correct professor",
+        response = ResponseEntity.class
+    )
+    @PostMapping ("/data/professors/{professor_id_or_name}")
     public ResponseEntity<String> addCourseByProfessor (
         @PathVariable ("professor_id_or_name") String professorIdOrName,
         @RequestBody 
@@ -146,7 +179,12 @@ public class ProfessorController {
 
     // Mappings for PUT calls to professor service
     
-    @RequestMapping (method = RequestMethod.PUT, value = "/data/professor/{professor_id_or_name}")
+    @ApiOperation (
+        value = "Update details of a professor with a given id or name",
+        notes = "Provide an id or name in order to lookup for a professor to update",
+        response = ResponseEntity.class
+    )
+    @PutMapping ("/data/professor/{professor_id_or_name}")
     public ResponseEntity<String> updateProfessor (
         @Valid 
         @PathVariable ("professor_id_or_name") String professorIdOrName,
@@ -172,7 +210,12 @@ public class ProfessorController {
 
     }
 
-    @RequestMapping (method = RequestMethod.PUT, value = "/data/professors/{professor_id_or_name}/courses/{course_id_or_name}")
+    @ApiOperation (
+        value = "Updates details of a specific course taught by a professor of given id or name",
+        notes = "Provide an id or name for both professor and course to update the correct course",
+        response = ResponseEntity.class
+    )
+    @PutMapping ("/data/professors/{professor_id_or_name}/courses/{course_id_or_name}")
     public ResponseEntity<String> updateCourseByProfessor (
         @Valid 
         @PathVariable ("professor_id_or_name") String professorIdOrName,
@@ -213,7 +256,12 @@ public class ProfessorController {
 
     // Mappings for DELETE calls to professor service
 
-    @RequestMapping (method = RequestMethod.DELETE, value = "/data/professors/{professor_name_or_id}")
+    @ApiOperation (
+        value = "Delete a professor by given id or name",
+        notes = "Provide a professor id or name in order to delete that professor",
+        response = void.class
+    )
+    @DeleteMapping ("/data/professors/{professor_name_or_id}")
     public void deleteProfessor (
         @PathVariable ("professor_name_or_id")
         String professorNameOrId 
@@ -235,7 +283,12 @@ public class ProfessorController {
 
     }
 
-    @RequestMapping (method = RequestMethod.DELETE, value = "/data/professors")
+    @ApiOperation (
+        value = "Delete all professors by given id or name",
+        notes = "Provide a list of id or name in order to delete those specific professor",
+        response = void.class
+    )
+    @DeleteMapping ("/data/professors")
     public void deleteProfessors (
         @RequestBody 
         List<@NotBlank @NotNull String> professorNameOrIds
@@ -246,7 +299,12 @@ public class ProfessorController {
 
     }
 
-    @RequestMapping (method = RequestMethod.DELETE, value = "/data/professors/{professor_id_or_name}/courses/{course_id_or_name}")
+    @ApiOperation (
+        value = "Delete courses taught by a specific professor",
+        notes = "Provide an id or name for both professor and course",
+        response = ResponseEntity.class
+    )
+    @DeleteMapping ("/data/professors/{professor_id_or_name}/courses/{course_id_or_name}")
     public ResponseEntity<String> deleteCourseByProfessor (
         @PathVariable ("professor_id_or_name") String professorIdOrName,
         @PathVariable ("course_id_or_name") String courseIdOrName
